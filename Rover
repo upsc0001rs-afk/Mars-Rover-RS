@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mars-1 Rover Control Room</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#14171C;--s1:#1C2128;--s2:#252C35;--ln:#333C48;--tx:#E9ECF1;--mu:#9AA5B5;--ac:#4FD6C4;--du:#D98E5B;--wa:#F2C94C;--ba:#FF7A68;--vi:#9B8CFF;color-scheme:dark}
+@media(prefers-color-scheme:light){:root:not([data-theme="dark"]){--bg:#EDF0F4;--s1:#FFFFFF;--s2:#E3E8EE;--ln:#C9D1DB;--tx:#1A2029;--mu:#566274;--ac:#0B8F80;--du:#B2622D;--wa:#9A7400;--ba:#CC3F2C;--vi:#5B49D6;color-scheme:light}}
+:root[data-theme="light"]{--bg:#EDF0F4;--s1:#FFFFFF;--s2:#E3E8EE;--ln:#C9D1DB;--tx:#1A2029;--mu:#566274;--ac:#0B8F80;--du:#B2622D;--wa:#9A7400;--ba:#CC3F2C;--vi:#5B49D6;color-scheme:light}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:70px;scroll-behavior:smooth}
+,::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.6 'IBM Plex Sans',system-ui,sans-serif}
+h1,h2,h3{font-family:'Barlow Condensed','Arial Narrow',sans-serif;margin:0;line-height:1.05;letter-spacing:.01em}
+h1{font-size:clamp(40px,7vw,76px);font-weight:700}
+h2{font-size:clamp(28px,4vw,38px);font-weight:700;margin-bottom:6px}
+h3{font-size:20px;font-weight:600}
+p{margin:0 0 10px;color:var(--mu);max-width:68ch}
+a{color:var(--ac)}
+:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+.wrap{max-width:1140px;margin:0 auto;padding:0 16px}
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:9;background:var(--bg);border-bottom:1px solid var(--ln)}
+header .wrap{display:flex;align-items:center;gap:14px;height:54px}
+.brand{font:700 22px 'Barlow Condensed',sans-serif;color:var(--tx);text-decoration:none;white-space:nowrap}
+.brand i{color:var(--du);font-style:normal}
+nav{display:flex;gap:2px;overflow-x:auto;flex:1;scrollbar-width:none}
+nav a{color:var(--mu);text-decoration:none;padding:6px 10px;border-radius:6px;white-space:nowrap;font-size:14px}
+nav a:hover{background:var(--s2);color:var(--tx)}
+section{padding:44px 0 8px}
+.hero{padding:34px 0 0}
+.hero p{font-size:17px;margin-top:12px}
+.b{font:500 14px 'IBM Plex Sans',sans-serif;background:var(--s2);color:var(--tx);border:1px solid var(--ln);border-radius:7px;padding:8px 13px;cursor:pointer;min-height:38px}
+.b:hover{border-color:var(--ac)}
+.b.on{background:var(--ac);color:#071513;border-color:var(--ac)}
+.b.pri{background:var(--du);border-color:var(--du);color:#1b0f06;font-weight:600}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.panel{background:var(--s1);border:1px solid var(--ln);border-radius:12px;padding:16px}
+.sim{display:grid;grid-template-columns:minmax(0,1fr) 290px;gap:16px;margin-top:22px}
+@media(max-width:860px){.sim{grid-template-columns:1fr}}
+canvas{display:block;width:100%;height:auto;border-radius:10px;touch-action:pan-y}
+.stage{padding:10px}
+.stage .row{margin-top:10px}
+.chips{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:12px}
+.chip{border:1px solid var(--ln);border-radius:8px;padding:7px 9px;font-weight:600;font-size:13px;color:var(--mu);border-left:4px solid var(--c)}
+.chip.on{background:var(--c);color:#0c1014;border-color:var(--c)}
+.tel{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.tel div{background:var(--s2);border-radius:8px;padding:8px 10px}
+.tel small{display:block;color:var(--mu);font-size:12px}
+.tel b{font:500 17px 'IBM Plex Mono',monospace}
+.ctl{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px 22px;margin-top:6px}
+.ctl label{display:block;font-size:13.5px;color:var(--mu)}
+.ctl label span{float:right;color:var(--tx);font-family:'IBM Plex Mono',monospace}
+input[type=range]{width:100%;accent-color:var(--ac)}
+input[type=number],input[type=text]{width:100%;background:var(--s2);color:var(--tx);border:1px solid var(--ln);border-radius:7px;padding:8px 10px;font:inherit;min-height:38px}
+.log{height:150px;overflow:auto;font:12.5px/1.6 'IBM Plex Mono',monospace;color:var(--mu);background:var(--s2);border-radius:8px;padding:8px 10px;margin-top:12px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:860px){.two{grid-template-columns:1fr}}
+pre{margin:0;overflow:auto;max-height:430px;background:var(--s2);border-radius:10px;padding:14px;font:12.5px/1.55 'IBM Plex Mono',monospace;color:var(--tx)}
+.pins{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.pins label{font-size:12.5px;color:var(--mu)}
+.big{font:500 26px 'IBM Plex Mono',monospace;color:var(--ac)}
+.tw{overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:560px}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--ln);vertical-align:top}
+th{color:var(--du);font-weight:600;width:22%}
+td:last-child{color:var(--mu)}
+svg text{font-family:'IBM Plex Sans',sans-serif}
+.fl{margin-bottom:6px;font-size:13px;color:var(--mu)}
+footer{margin-top:50px;border-top:1px solid var(--ln);padding:22px 0 30px;color:var(--mu);font-size:14px}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+<a class="brand" href="#top">MARS<i>-1</i></a>
+<nav aria-label="Sections"><a href="#sim">Simulator</a><a href="#fw">Firmware</a><a href="#echo">Echo calculator</a><a href="#design">Design</a><a href="#hw">Hardware</a><a href="#me">Profile</a></nav>
+<button class="b" id="theme" type="button" aria-label="Toggle light and dark theme">Theme</button>
+</div></header>
+
+<main class="wrap" id="top">
+<div class="hero">
+<h1>Mars-1 autonomous rover</h1>
+<p>An obstacle-avoiding rover prototype modelled on NASA planetary explorers, built by <b id="pname" style="color:var(--tx)">Your Name</b>, <span id="prole">Embedded Systems &amp; Robotics Developer</span>. Drive the simulation below, tune the controller, and export firmware that matches your settings.</p>
+</div>
+
+<section id="sim" style="padding-top:8px">
+<div class="sim">
+<div class="panel stage">
+<canvas id="cv" width="800" height="500" aria-label="Rover simulation. Use the buttons below to edit terrain."></canvas>
+<div class="row">
+<button class="b pri" id="play" type="button">Pause</button>
+<button class="b" id="reset" type="button">Restart rover</button>
+<button class="b" id="rand" type="button">Random terrain</button>
+<button class="b" id="clear" type="button">Clear rocks</button>
+<button class="b" id="trail" type="button">Clear trail</button>
+</div>
+<div class="row" role="group" aria-label="Terrain edit mode">
+<span class="fl" style="margin:0">Terrain tool:</span>
+<button class="b on" data-mode="view" type="button">View</button>
+<button class="b" data-mode="add" type="button">Add rock</button>
+<button class="b" data-mode="move" type="button">Move rock</button>
+<button class="b" data-mode="del" type="button">Delete rock</button>
+</div>
+<canvas id="ch" width="800" height="120" style="margin-top:10px" aria-label="Distance history chart"></canvas>
+</div>
+<aside class="panel">
+<div class="chips" id="chips"></div>
+<div class="tel">
+<div><small>Distance</small><b id="t_d">--</b></div>
+<div><small>Echo time</small><b id="t_us">--</b></div>
+<div><small>Speed</small><b id="t_v">--</b></div>
+<div><small>Heading</small><b id="t_h">--</b></div>
+<div><small>Collisions</small><b id="t_c">0</b></div>
+<div><small>Evasions</small><b id="t_e">0</b></div>
+<div><small>Travelled</small><b id="t_t">0 m</b></div>
+<div><small>Uptime</small><b id="t_u">0 s</b></div>
+</div>
+<div class="log" id="log" role="log" aria-live="off"></div>
+<div class="row" style="margin-top:10px"><button class="b" id="copylog" type="button">Copy log</button><button class="b" id="clrlog" type="button">Clear log</button></div>
+</aside>
+</div>
+
+<div class="panel" style="margin-top:16px">
+<h3>Controller tuning</h3>
+<p style="margin-top:4px">Changes apply instantly and are saved in this browser. Motor mismatch and wheel slip are simulated hardware faults. Use the trim to cancel them.</p>
+<div class="ctl" id="ctl"></div>
+<div class="row" style="margin-top:14px">
+<button class="b pri" id="calib" type="button">Auto-calibrate right trim</button>
+<button class="b" id="defaults" type="button">Reset settings</button>
+</div>
+</div>
+</section>
+
+<section id="fw">
+<h2>Firmware generator</h2>
+<p>Your tuning values and pin map become a ready-to-upload Arduino sketch. Change the pins to match your wiring.</p>
+<div class="two">
+<div class="panel"><h3>Pin map</h3><div class="pins" id="pins" style="margin-top:10px"></div>
+<p style="margin-top:12px">Left motor PWM must be on a PWM pin (3, 5, 6, 9, 10 or 11 on the Uno).</p></div>
+<div class="panel"><h3>Current settings</h3><p id="sumry" style="margin-top:8px"></p><button class="b pri" id="copy" type="button">Copy firmware</button> <span id="cmsg" class="fl"></span></div>
+</div>
+<pre id="code" tabindex="0" style="margin-top:16px"></pre>
+</section>
+
+<section id="echo">
+<h2>Echo calculator</h2>
+<p>Convert between echo time and distance. Speed of sound shifts with temperature, so set it for your room.</p>
+<div class="panel two" style="grid-template-columns:repeat(auto-fit,minmax(200px,1fr));display:grid">
+<div><label class="fl" for="e_us">Echo time (µs)</label><input id="e_us" type="number" value="1166" min="0"></div>
+<div><label class="fl" for="e_cm">Distance (cm)</label><input id="e_cm" type="number" value="20" min="0" step="0.1"></div>
+<div><label class="fl" for="e_t">Air temperature (°C)</label><input id="e_t" type="number" value="20" step="1"></div>
+<div><div class="fl">Speed of sound</div><div class="big" id="e_v">343 m/s</div></div>
+</div>
+<p style="margin-top:10px">Formula: d = t × v / 2, where v is in cm per µs. Halving accounts for the round trip.</p>
+</section>
+
+<section id="design">
+<h2>System design</h2>
+<p>The ATmega328P reads the ultrasonic sensor, runs the four-state controller, and sends PWM and direction signals to the H-bridge, which drives the two TT motors from an isolated supply.</p>
+<div class="panel tw">
+<svg viewBox="0 0 760 270" width="100%" style="min-width:620px" role="img" aria-label="Block diagram: battery to regulator to microcontroller; sensor to microcontroller; microcontroller to H-bridge to two motors">
+<defs><marker id="ar" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8z" fill="var(--mu)"/></marker></defs>
+<g fill="none" stroke="var(--mu)" stroke-width="1.6" marker-end="url(#ar)">
+<path d="M130,50 V92"/><path d="M200,125 H290"/><path d="M370,200 V172" /><path d="M450,125 H540"/><path d="M200,35 H520 V92" stroke="var(--wa)" /><path d="M620,92 V60" /><path d="M620,172 V205"/></g>
+<g stroke-width="1.6">
+<rect x="60" y="10" width="140" height="40" rx="8" fill="var(--s2)" stroke="var(--wa)"/><text x="130" y="35" text-anchor="middle" fill="var(--tx)" font-size="14">Battery pack</text>
+<rect x="60" y="92" width="140" height="66" rx="8" fill="var(--s2)" stroke="var(--wa)"/><text x="130" y="122" text-anchor="middle" fill="var(--tx)" font-size="14">Regulator</text><text x="130" y="141" text-anchor="middle" fill="var(--mu)" font-size="12">5 V logic rail</text>
+<rect x="290" y="82" width="160" height="90" rx="8" fill="var(--s2)" stroke="var(--du)"/><text x="370" y="120" text-anchor="middle" fill="var(--tx)" font-size="15" font-weight="600">ATmega328P</text><text x="370" y="140" text-anchor="middle" fill="var(--mu)" font-size="12">state machine + PWM</text>
+<rect x="290" y="200" width="160" height="50" rx="8" fill="var(--s2)" stroke="var(--ac)"/><text x="370" y="222" text-anchor="middle" fill="var(--tx)" font-size="14">Ultrasonic sensor</text><text x="370" y="239" text-anchor="middle" fill="var(--mu)" font-size="12">TRIG out, ECHO in</text>
+<rect x="540" y="92" width="160" height="80" rx="8" fill="var(--s2)" stroke="var(--vi)"/><text x="620" y="125" text-anchor="middle" fill="var(--tx)" font-size="14">H-bridge driver</text><text x="620" y="144" text-anchor="middle" fill="var(--mu)" font-size="12">direction + speed</text>
+<rect x="540" y="10" width="160" height="50" rx="8" fill="var(--s2)" stroke="var(--ac)"/><text x="620" y="40" text-anchor="middle" fill="var(--tx)" font-size="14">Left TT motor</text>
+<rect x="540" y="205" width="160" height="50" rx="8" fill="var(--s2)" stroke="var(--ac)"/><text x="620" y="235" text-anchor="middle" fill="var(--tx)" font-size="14">Right TT motor</text>
+</g>
+<text x="360" y="28" text-anchor="middle" fill="var(--wa)" font-size="12">motor supply</text>
+<text x="494" y="117" text-anchor="middle" fill="var(--du)" font-size="12">PWM + DIR</text>
+</svg>
+</div>
+<div class="panel" style="margin-top:16px">
+<h3>How the rover decides</h3>
+<p style="margin-top:6px">While cruising, any reading under the threshold triggers brake, then reverse, then pivot right. The rover resumes cruising once the pivot time has passed and the path ahead is clear. Timers use the clock instead of blocking delays, so sensing never stops.</p>
+</div>
+</section>
+
+<section id="hw">
+<h2>Hardware</h2>
+<div class="panel tw"><table>
+<tr><th>Controller</th><td>ATmega328P on an Arduino Uno board runs all sensor cycles, logic and PWM generation.</td></tr>
+<tr><th>Sensing</th><td>RGB ultrasonic distance sensor works as an echolocation transceiver and maps blockages ahead.</td></tr>
+<tr><th>Drive</th><td>Aluminium-chassis differential drive with two high-torque TT DC motors behind an H-bridge.</td></tr>
+<tr><th>Power</th><td>Isolated mobile supply feeds low-power logic and high-draw actuators on separate paths with a shared ground.</td></tr>
+</table></div>
+</section>
+
+<section id="me">
+<h2>Make it yours</h2>
+<p>Your details update the page header and footer and are stored only in this browser.</p>
+<div class="panel two">
+<div><label class="fl" for="f_name">Your name</label><input id="f_name" type="text" maxlength="60"></div>
+<div><label class="fl" for="f_role">Your role</label><input id="f_role" type="text" maxlength="80"></div>
+<div><label class="fl" for="f_link">Project link (GitHub or video, https only)</label><input id="f_link" type="text" placeholder="https://github.com/you/mars-rover" maxlength="200"></div>
+<div style="align-self:end"><button class="b pri" id="f_save" type="button">Save details</button> <span id="f_msg" class="fl"></span></div>
+</div>
+</section>
+</main>
+<footer><div class="wrap">Mars-1 rover project by <b id="fname" style="color:var(--tx)">Your Name</b>. <span id="flink"></span></div></footer>
+
+<script>
+(function(){
+var $=function(s){return document.querySelector(s)};
+var DEF={thr:20,pwm:200,trimL:0,trimR:0,mism:92,slip:4,noise:1,tBrake:250,tRev:600,tPivot:450,sim:1};
+var S=Object.assign({},DEF),P={TRIG:7,ECHO:8,ENA:5,IN1:4,IN2:3,ENB:6,IN3:12,IN4:11};
+var PR={name:'Your Name',role:'Embedded Systems & Robotics Developer',link:''};
+function load(){try{var j=JSON.parse(localStorage.getItem('mars1')||'{}');if(j.S)Object.assign(S,j.S);if(j.P)Object.assign(P,j.P);if(j.PR)Object.assign(PR,j.PR);if(j.theme)document.documentElement.setAttribute('data-theme',j.theme)}catch(e){}}
+function save(extra){try{var j=JSON.parse(localStorage.getItem('mars1')||'{}');j.S=S;j.P=P;j.PR=PR;if(extra)Object.assign(j,extra);localStorage.setItem('mars1',JSON.stringify(j))}catch(e){}}
+load();
+
+/* ---------- controls ---------- */
+var CT=[['thr','Stop distance',5,60,1,' cm'],['pwm','Base motor PWM',100,255,1,''],['trimL','Left trim',-40,40,1,''],['trimR','Right trim',-40,40,1,''],['mism','Right motor efficiency (fault)',75,100,1,'%'],['slip','Wheel slip (fault)',0,30,1,'%'],['noise','Sensor noise',0,6,0.5,' cm'],['tBrake','Brake time',100,800,10,' ms'],['tRev','Reverse time',200,1500,10,' ms'],['tPivot','Pivot time',200,1200,10,' ms'],['sim','Simulation speed',1,4,1,'x']];
+var ctl=$('#ctl');
+CT.forEach(function(c){var l=document.createElement('label');l.innerHTML=c[1]+'<span id="o_'+c[0]+'"></span><input type="range" id="r_'+c[0]+'" min="'+c[2]+'" max="'+c[3]+'" step="'+c[4]+'">';ctl.appendChild(l);
+ var r=l.querySelector('input');r.value=S[c[0]];
+ function sh(){$('#o_'+c[0]).textContent=S[c[0]]+c[5]}
+ r.addEventListener('input',function(){S[c[0]]=+r.value;sh();save();gen()});sh()});
+function syncCtl(){CT.forEach(function(c){$('#r_'+c[0]).value=S[c[0]];$('#o_'+c[0]).textContent=S[c[0]]+c[5]})}
+$('#calib').onclick=function(){S.trimR=Math.max(-40,Math.min(40,Math.round(S.pwm/(S.mism/100)-S.pwm)));syncCtl();save();gen();log('Right trim set to '+S.trimR)};
+$('#defaults').onclick=function(){Object.assign(S,DEF);syncCtl();save();gen();log('Settings reset')};
+
+/* ---------- world ---------- */
+var cv=$('#cv'),g=cv.getContext('2d'),W=800,H=500,PX=2,R=16,TRACK=30,RANGE=300;
+var rocks=[],rover,trail=[],hist=[],clock=0,run=!window.matchMedia('(prefers-reduced-motion: reduce)').matches,mode='view',drag=null,stat;
+var ST=[['Cruise','#4FD6C4'],['Brake','#F2C94C'],['Reverse','#FF7A68'],['Pivot right','#9B8CFF']];
+var chips=$('#chips');ST.forEach(function(s,i){var d=document.createElement('div');d.className='chip';d.id='chip'+i;d.style.setProperty('--c',s[1]);d.textContent=(i+1)+'. '+s[0];chips.appendChild(d)});
+function newRover(){rover={x:70,y:250,a:0,st:0,t:0,d:150,v:0};stat={col:0,ev:0,dist:0,hit:false};clock=0;trail=[];hist=[];$('#t_c').textContent=0;$('#t_e').textContent=0}
+function randRocks(){rocks=[];for(var i=0;i<8;i++){var o={x:150+Math.random()*620,y:30+Math.random()*440,r:14+Math.random()*18};if(rocks.every(function(q){return Math.hypot(q.x-o.x,q.y-o.y)>q.r+o.r+50}))rocks.push(o)}}
+randRocks();newRover();
+var bgc=document.createElement('canvas');bgc.width=W;bgc.height=H;(function(){var b=bgc.getContext('2d'),gr=b.createRadialGradient(400,250,60,400,250,520);gr.addColorStop(0,'#A5542F');gr.addColorStop(1,'#6B3320');b.fillStyle=gr;b.fillRect(0,0,W,H);var s=3;function rn(){s=(s*16807)%2147483647;return s/2147483647}
+for(var i=0;i<26;i++){var x=rn()*W,y=rn()*H,r=8+rn()*34;b.fillStyle='rgba(40,15,8,.28)';b.beginPath();b.arc(x,y,r,0,7);b.fill();b.strokeStyle='rgba(255,190,140,.22)';b.lineWidth=2;b.beginPath();b.arc(x-1,y-1,r,2.4,5.5);b.stroke()}
+for(var j=0;j<260;j++){b.fillStyle='rgba(255,210,170,'+(rn()*.12)+')';b.fillRect(rn()*W,rn()*H,2,2)}})();
+
+function cast(ox,oy,a){var dx=Math.cos(a),dy=Math.sin(a),best=RANGE;
+ rocks.forEach(function(o){var px=ox-o.x,py=oy-o.y,b=px*dx+py*dy,c=px*px+py*py-o.r*o.r,d=b*b-c;if(d>=0){var t=-b-Math.sqrt(d);if(t>=0&&t<best)best=t}});
+ [[0,dx,ox],[W,dx,ox],[0,dy,oy],[H,dy,oy]].forEach(function(w,i){if(w[1]!==0){var t=(w[0]-w[2])/w[1];if(t>=0&&t<best)best=t}});return best}
+function sense(){var ox=rover.x+Math.cos(rover.a)*R,oy=rover.y+Math.sin(rover.a)*R,m=RANGE;for(var k=-2;k<=2;k++){m=Math.min(m,cast(ox,oy,rover.a+k*0.12))}
+ rover.sd=m;return Math.max(2,m/PX+(Math.random()*2-1)*S.noise)}
+function go(n){rover.st=n;rover.t=0;if(n===1){stat.ev++;$('#t_e').textContent=stat.ev}log(ST[n][0]+' at '+rover.d.toFixed(1)+' cm')}
+function spd(p){return Math.max(0,p)/6*PX}
+function step(dt){rover.t+=dt*1000;clock+=dt;var d=sense();rover.d=d;var vl=0,vr=0,sl=1-S.slip/100*Math.random(),sr=1-S.slip/100*Math.random(),m=S.mism/100,L=spd(S.pwm+S.trimL),Rr=spd(S.pwm+S.trimR)*m;
+ if(rover.st===0){vl=L;vr=Rr;if(d<S.thr)go(1)}
+ else if(rover.st===1){if(rover.t>S.tBrake)go(2)}
+ else if(rover.st===2){vl=-L;vr=-Rr;if(rover.t>S.tRev)go(3)}
+ else{vl=L;vr=-Rr;if(rover.t>S.tPivot&&d>=S.thr)go(0)}
+ vl*=sl;vr*=sr;var v=(vl+vr)/2;rover.v=v;rover.a+=(vl-vr)/TRACK*dt;rover.x+=Math.cos(rover.a)*v*dt;rover.y+=Math.sin(rover.a)*v*dt;stat.dist+=Math.abs(v)*dt/PX/100;
+ var hit=false;rocks.forEach(function(o){var dx=rover.x-o.x,dy=rover.y-o.y,q=Math.hypot(dx,dy),mn=o.r+R-2;if(q<mn){hit=true;rover.x=o.x+dx/q*mn;rover.y=o.y+dy/q*mn}});
+ if(rover.x<R||rover.x>W-R||rover.y<R||rover.y>H-R){hit=true;rover.x=Math.max(R,Math.min(W-R,rover.x));rover.y=Math.max(R,Math.min(H-R,rover.y))}
+ if(hit&&!stat.hit){stat.col++;$('#t_c').textContent=stat.col;log('Collision detected')}stat.hit=hit;
+ if(!step.n||++step.n%3===0){trail.push([rover.x,rover.y]);if(trail.length>900)trail.shift();hist.push([Math.min(d,150),rover.st]);if(hist.length>300)hist.shift()}step.n=(step.n||0)+1}
+
+/* ---------- drawing ---------- */
+function draw(){g.drawImage(bgc,0,0);
+ g.strokeStyle='rgba(79,214,196,.55)';g.lineWidth=2;g.beginPath();trail.forEach(function(p,i){i?g.lineTo(p[0],p[1]):g.moveTo(p[0],p[1])});g.stroke();
+ rocks.forEach(function(o){var gr=g.createRadialGradient(o.x-o.r*.3,o.y-o.r*.3,2,o.x,o.y,o.r);gr.addColorStop(0,'#9C8576');gr.addColorStop(1,'#4A3A31');g.fillStyle=gr;g.beginPath();g.arc(o.x,o.y,o.r,0,7);g.fill()});
+ var ox=rover.x+Math.cos(rover.a)*R,oy=rover.y+Math.sin(rover.a)*R,hit=rover.sd||RANGE;
+ g.fillStyle='rgba(79,214,196,.18)';g.beginPath();g.moveTo(ox,oy);g.arc(ox,oy,hit,rover.a-.24,rover.a+.24);g.closePath();g.fill();
+ g.strokeStyle='#F2C94C';g.setLineDash([5,4]);g.lineWidth=1.5;g.beginPath();g.arc(ox,oy,S.thr*PX,rover.a-.5,rover.a+.5);g.stroke();g.setLineDash([]);
+ g.save();g.translate(rover.x,rover.y);g.rotate(rover.a);
+ g.fillStyle='#14171C';[[-12,-19],[-12,13],[8,-19],[8,13]].forEach(function(w){g.fillRect(w[0],w[1],10,6)});
+ g.fillStyle='#D5DAE5';g.strokeStyle='#8F9BBE';g.lineWidth=1.5;g.beginPath();g.roundRect(-18,-14,36,28,5);g.fill();g.stroke();
+ g.fillStyle='#24408E';g.fillRect(-15,-10,16,20);g.strokeStyle='#5C7DD6';g.lineWidth=.8;g.strokeRect(-15,-10,16,20);
+ g.fillStyle='#E4572E';g.fillRect(4,-6,8,12);g.fillStyle='#14171C';g.beginPath();g.arc(17,-6,3.5,0,7);g.arc(17,6,3.5,0,7);g.fill();g.fillStyle='#4FD6C4';g.beginPath();g.arc(17,-6,1.8,0,7);g.arc(17,6,1.8,0,7);g.fill();g.restore();
+ var T=getComputedStyle(document.documentElement);
+ var c2=$('#ch'),h=c2.getContext('2d');h.clearRect(0,0,800,120);h.fillStyle=T.getPropertyValue('--s2');h.fillRect(0,0,800,120);
+ var bw=800/300;hist.forEach(function(p,i){h.fillStyle=ST[p[1]][1];h.globalAlpha=.22;h.fillRect(i*bw,0,bw+1,120);h.globalAlpha=1});
+ h.strokeStyle='#F2C94C';h.setLineDash([4,4]);h.beginPath();var ty=120-S.thr/150*110-5;h.moveTo(0,ty);h.lineTo(800,ty);h.stroke();h.setLineDash([]);
+ h.strokeStyle=T.getPropertyValue('--ac');h.lineWidth=2;h.beginPath();hist.forEach(function(p,i){var y=120-p[0]/150*110-5;i?h.lineTo(i*bw,y):h.moveTo(i*bw,y)});h.stroke();
+ h.fillStyle=T.getPropertyValue('--mu');h.font='12px sans-serif';h.fillText('Distance over time (0 to 150 cm). Dashed line is the stop distance.',8,14)}
+function tel(){$('#t_d').textContent=rover.d.toFixed(1)+' cm';$('#t_us').textContent=Math.round(rover.d*2/0.0343)+' µs';$('#t_v').textContent=(rover.v/PX).toFixed(0)+' cm/s';$('#t_h').textContent=(((rover.a*180/Math.PI)%360+360)%360).toFixed(0)+'°';$('#t_t').textContent=stat.dist.toFixed(1)+' m';$('#t_u').textContent=clock.toFixed(0)+' s';
+ for(var i=0;i<4;i++)$('#chip'+i).classList.toggle('on',rover.st===i)}
+var last=0;function loop(ts){var dt=Math.min(.05,(ts-last)/1000||0);last=ts;if(run){var n=S.sim;for(var i=0;i<n;i++)step(dt)}draw();tel();requestAnimationFrame(loop)}
+
+/* ---------- buttons, terrain editing ---------- */
+var lg=$('#log');function log(m){var e=document.createElement('div');e.textContent='['+clock.toFixed(1)+'s] '+m;lg.appendChild(e);while(lg.children.length>80)lg.removeChild(lg.firstChild);lg.scrollTop=lg.scrollHeight}
+function setPlay(){$('#play').textContent=run?'Pause':'Resume'}setPlay();
+$('#play').onclick=function(){run=!run;setPlay()};
+$('#reset').onclick=function(){newRover();log('Rover restarted')};
+$('#rand').onclick=function(){randRocks();newRover();log('New terrain')};
+$('#clear').onclick=function(){rocks=[];log('Rocks cleared')};
+$('#trail').onclick=function(){trail=[];hist=[]};
+$('#clrlog').onclick=function(){lg.textContent=''};
+$('#copylog').onclick=function(){cp(lg.innerText,lg)};
+document.querySelectorAll('[data-mode]').forEach(function(b){b.onclick=function(){mode=b.dataset.mode;document.querySelectorAll('[data-mode]').forEach(function(x){x.classList.toggle('on',x===b)});cv.style.touchAction=mode==='view'?'pan-y':'none';cv.style.cursor=mode==='view'?'default':'crosshair'}});
+function pt(e){var r=cv.getBoundingClientRect();return{x:(e.clientX-r.left)*W/r.width,y:(e.clientY-r.top)*H/r.height}}
+cv.addEventListener('pointerdown',function(e){if(mode==='view')return;var p=pt(e),k=-1;rocks.forEach(function(o,i){if(Math.hypot(o.x-p.x,o.y-p.y)<=o.r+5)k=i});
+ if(mode==='add'&&k<0&&Math.hypot(p.x-rover.x,p.y-rover.y)>R+30)rocks.push({x:p.x,y:p.y,r:12+Math.random()*18});
+ else if(mode==='del'&&k>=0)rocks.splice(k,1);
+ else if(mode==='move'&&k>=0){drag=rocks[k];cv.setPointerCapture(e.pointerId)}});
+cv.addEventListener('pointermove',function(e){if(drag){var p=pt(e);drag.x=p.x;drag.y=p.y}});
+cv.addEventListener('pointerup',function(){drag=null});
+cv.addEventListener('pointercancel',function(){drag=null});
+
+/* ---------- clipboard ---------- */
+function cp(txt,el){var ok=false;try{navigator.clipboard.writeText(txt).then(function(){$('#cmsg').textContent='Copied'},function(){sel(el)});ok=true}catch(e){}if(!ok)sel(el)}
+function sel(el){var r=document.createRange();r.selectNodeContents(el);var s=getSelection();s.removeAllRanges();s.addRange(r);$('#cmsg').textContent='Selected. Press copy on your device.'}
+
+/* ---------- firmware generator ---------- */
+var pinsEl=$('#pins');Object.keys(P).forEach(function(k){var l=document.createElement('label');l.innerHTML=k+'<input type="number" min="0" max="19" value="'+P[k]+'" id="p_'+k+'">';pinsEl.appendChild(l);l.querySelector('input').addEventListener('input',function(e){P[k]=+e.target.value;save();gen()})});
+function cl(v){return Math.max(0,Math.min(255,Math.round(v)))}
+function gen(){var L=cl(S.pwm+S.trimL),Rr=cl(S.pwm+S.trimR);
+$('#sumry').textContent='Stop at '+S.thr+' cm. PWM left '+L+', right '+Rr+'. Brake '+S.tBrake+' ms, reverse '+S.tRev+' ms, pivot '+S.tPivot+' ms.';
+$('#code').textContent=['// Mars-1 rover firmware (generated by the control room)','const uint8_t TRIG='+P.TRIG+', ECHO='+P.ECHO+';','const uint8_t ENA='+P.ENA+', IN1='+P.IN1+', IN2='+P.IN2+';   // left motor','const uint8_t ENB='+P.ENB+', IN3='+P.IN3+', IN4='+P.IN4+';  // right motor','','const float STOP_CM = '+S.thr+'.0;','const int SPD_L = '+L+', SPD_R = '+Rr+';   // per-motor trim','const unsigned long T_BRAKE='+S.tBrake+', T_REV='+S.tRev+', T_PIVOT='+S.tPivot+';','','enum State { CRUISE, BRAKE, REVERSE, PIVOT };','State state = CRUISE;','unsigned long t0 = 0;','','void setup() {','  pinMode(TRIG, OUTPUT); pinMode(ECHO, INPUT);','  pinMode(ENA, OUTPUT); pinMode(IN1, OUTPUT); pinMode(IN2, OUTPUT);','  pinMode(ENB, OUTPUT); pinMode(IN3, OUTPUT); pinMode(IN4, OUTPUT);','  Serial.begin(9600);','}','','float readCm() {                       // d = t * 0.0343 / 2','  digitalWrite(TRIG, LOW);  delayMicroseconds(2);','  digitalWrite(TRIG, HIGH); delayMicroseconds(10);','  digitalWrite(TRIG, LOW);','  unsigned long us = pulseIn(ECHO, HIGH, 30000UL);','  return us ? us * 0.0343 / 2.0 : 999.0;','}','','void drive(int l, int r) {             // sign = direction, size = PWM','  digitalWrite(IN1, l >= 0); digitalWrite(IN2, l < 0); analogWrite(ENA, abs(l));','  digitalWrite(IN3, r >= 0); digitalWrite(IN4, r < 0); analogWrite(ENB, abs(r));','}','','void loop() {','  float d = readCm();','  switch (state) {','    case CRUISE:','      drive(SPD_L, SPD_R);','      if (d < STOP_CM) { drive(0, 0); t0 = millis(); state = BRAKE; }','      break;','    case BRAKE:','      if (millis() - t0 > T_BRAKE) { drive(-SPD_L, -SPD_R); t0 = millis(); state = REVERSE; }','      break;','    case REVERSE:','      if (millis() - t0 > T_REV) { drive(SPD_L, -SPD_R); t0 = millis(); state = PIVOT; }','      break;','    case PIVOT:','      if (millis() - t0 > T_PIVOT && d >= STOP_CM) state = CRUISE;','      break;','  }','  Serial.println(d);','}'].join('\n')}
+$('#copy').onclick=function(){cp($('#code').textContent,$('#code'))};
+
+/* ---------- echo calculator ---------- */
+function k(){return(331.3+0.606*(+$('#e_t').value||0))/10000}
+function eu(){var v=+$('#e_us').value||0;$('#e_cm').value=(v*k()/2).toFixed(1);ev()}
+function ec(){var v=+$('#e_cm').value||0;$('#e_us').value=Math.round(v*2/k());ev()}
+function ev(){$('#e_v').textContent=(k()*10000).toFixed(1)+' m/s'}
+$('#e_us').oninput=eu;$('#e_cm').oninput=ec;$('#e_t').oninput=eu;eu();
+
+/* ---------- profile, theme ---------- */
+function applyPR(){$('#pname').textContent=PR.name;$('#fname').textContent=PR.name;$('#prole').textContent=PR.role;var f=$('#flink');f.textContent='';if(/^https:\/\//.test(PR.link)){var a=document.createElement('a');a.href=PR.link;a.target='_blank';a.rel='noopener noreferrer';a.textContent='View project files';f.appendChild(a)}
+ $('#f_name').value=PR.name;$('#f_role').value=PR.role;$('#f_link').value=PR.link}
+$('#f_save').onclick=function(){PR.name=$('#f_name').value.trim()||'Your Name';PR.role=$('#f_role').value.trim()||'Embedded Systems & Robotics Developer';var l=$('#f_link').value.trim();PR.link=/^https:\/\//.test(l)?l:'';applyPR();save();$('#f_msg').textContent=l&&!PR.link?'Saved. Link ignored because it must start with https://':'Saved'};
+$('#theme').onclick=function(){var r=document.documentElement,cur=r.getAttribute('data-theme')||(matchMedia('(prefers-color-scheme: light)').matches?'light':'dark'),n=cur==='dark'?'light':'dark';r.setAttribute('data-theme',n);save({theme:n})};
+applyPR();gen();requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>
